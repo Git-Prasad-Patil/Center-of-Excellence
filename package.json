@@ -1,0 +1,26 @@
+{
+  "name": "center-of-excellence",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Git-Prasad-Patil/Center-of-Excellence.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Git-Prasad-Patil/Center-of-Excellence/issues"
+  },
+  "homepage": "https://github.com/Git-Prasad-Patil/Center-of-Excellence#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "playwright": "^1.61.1"
+  }
+}
