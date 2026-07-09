@@ -6,15 +6,17 @@ export default defineConfig({
   expect: {
     timeout: 5000,
   },
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'list',
+  reporter: [["html", { open: "always", outputFolder: "html-report" }]],
   use: {
     actionTimeout: 0,
-    baseURL: 'https://playwright.dev',
+    // baseURL: 'https://playwright.dev',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
   projects: [
     {
