@@ -26,6 +26,9 @@ Notes summarized from the reference pages you shared, written up topic-by-topic 
 8. **[Screenshot & Video Capture on Failure](./08-screenshots-videos-on-failure.md)**
    Config options for screenshots, video, and traces — and a sensible CI default.
 
+9. **[Exercise Implementation Summary](./09-exercise-implementation-summary.md)**
+   What was actually built for these exercises (fixture, retry spec, isolation refactor), where it lives, and what running it proved.
+
 ## Source pages referenced
 - [Best Practices — Playwright](https://playwright.dev/docs/best-practices)
 - [Test Flakiness — Spotify Engineering](https://engineering.atspotify.com/2019/11/test-flakiness-methods-for-identifying-and-dealing-with-flaky-tests)
