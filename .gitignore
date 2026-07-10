@@ -7,3 +7,5 @@ yarn-error.log*
 playwright-report/
 test-results/
 html-report/
+screenshots/
+test-results/.last-run.json
