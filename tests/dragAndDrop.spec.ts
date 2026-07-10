@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test } from "@playwright/test";
 
 test("Drag and drop", async ({ page }) => {
   await page.goto("https://seleniumbase.io/other/drag_and_drop");
