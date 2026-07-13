@@ -17,4 +17,14 @@ export default [
       "no-console": "off",
     },
   },
+  {
+    files: ["cucumber.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        module: "writable",
+        require: "readonly",
+      },
+    },
+  },
 ];

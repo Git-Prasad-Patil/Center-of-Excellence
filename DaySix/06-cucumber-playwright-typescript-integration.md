@@ -1,0 +1,27 @@
+# Cucumber + Playwright Integration in TypeScript
+
+`@cucumber/cucumber` and `@playwright/test` are two separate tools that don't know about each other out of the box — Playwright's own test runner (`playwright test`, already used elsewhere in this repo under [tests/](../tests)) has its own fixtures, its own `test`/`expect`, and its own lifecycle. Cucumber doesn't use any of that; it only understands `.feature` files, step definitions, and a small set of lifecycle hooks (`Before`/`After`/`BeforeAll`/`AfterAll`). Wiring them together means: use Playwright's **library** (`@playwright/test`'s `chromium`/`Browser`/`Page` APIs, and its `expect`) purely as a browser-automation and assertion toolkit inside Cucumber's own runner and hooks — not Playwright's test runner itself.
+
+## The pieces, and where they live in this repo
+
+1. **A CommonJS-loadable config** — [cucumber.js](../cucumber.js). Cucumber-js's CLI reads this to know: which `.feature` files to run, that TypeScript needs transpiling (`--require-module ts-node/register`), and which files to `--require` before running (support code and step definitions) so their `Before`/`Given`/`When`/`Then` registrations are loaded first.
+
+2. **A custom `World`** — [features/support/world.ts](../features/support/world.ts). Cucumber gives every scenario its own fresh "World" instance (a plain object `this` inside every step/hook). Extending `World` with Playwright-specific fields (`browser`, `context`, `page`) is the idiomatic way to make the browser and page available to every step via `this.page`, without any global/shared mutable state leaking between scenarios.
+
+3. **Hooks that manage the browser lifecycle** — [features/support/hooks.ts](../features/support/hooks.ts):
+   - `BeforeAll` launches one `chromium` `Browser` for the whole run (expensive to do per-scenario).
+   - `Before` opens a fresh `BrowserContext` + `Page` per scenario — this is what gives each scenario test isolation (its own cookies, localStorage, and therefore its own empty cart) without paying to relaunch the whole browser every time. Same principle documented for Playwright's own test runner in [DayFive's test isolation notes](../DayFive/07-test-isolation.md), just implemented by hand here instead of relying on `@playwright/test`'s built-in per-test fixture.
+   - `After` closes the context/page, and attaches a screenshot to the Cucumber report if the scenario failed (`this.attach(screenshot, "image/png")` — Cucumber's mechanism for embedding artifacts in HTML/JSON reports, filling the same role as Playwright's own `screenshot: 'only-on-failure'` config used elsewhere in this repo, but done manually since Cucumber has no such built-in option). It also does best-effort account cleanup: if a scenario set `this.createdAccountEmail` (i.e. it registered a throwaway test account), the hook deletes it via `AccountPage.deleteAccount()` before closing the page — a small piece of test-suite hygiene that only a shared `After` hook makes easy to guarantee for every scenario that creates an account, without every such step definition remembering to clean up after itself.
+   - `AfterAll` closes the browser.
+
+4. **Playwright's `expect` for assertions** — step definitions import `expect` from `@playwright/test` (not from Cucumber, which has no assertion library of its own), so scenarios still get Playwright's auto-retrying web-first assertions (`toBeVisible()`, `toContainText()`, etc.) rather than needing a separate assertion library like Chai.
+
+5. **Page objects, not inline locators** — [features/support/pages.ts](../features/support/pages.ts) wraps each area of the site (home/products/cart/signup-login/checkout/payment) in a small class taking a `Page` in its constructor. Step definitions call `new CartPage(this.page).remove(productName)` rather than embedding CSS selectors directly in step files. This is what actually makes steps reusable and maintainable: a markup change updates one method in one page object, not every step definition that happens to touch that page.
+
+## Why not just use Playwright's own test runner with a Gherkin-flavoured shim?
+
+Some teams instead keep `playwright test` as the runner and only borrow Gherkin *syntax* via a preprocessor. That avoids re-implementing hooks/lifecycle by hand (as `hooks.ts` does here), but loses `@cucumber/cucumber`'s actual value: real step-definition reuse across scenarios via Cucumber Expressions (`{string}`, `{int}`), tag-based filtering (`--tags`), and genuine data tables (see [05](./05-cucumber-datatables.md)) as first-class step arguments. This repo uses real `@cucumber/cucumber` for that reason — the assignment is specifically about Cucumber/Gherkin depth, not about Playwright's test runner (which is already covered in [tests/](../tests) and [DayFive](../DayFive)).
+
+## Practical trade-off worth naming
+
+Because Cucumber's lifecycle is separate from Playwright's, you lose some things Playwright's test runner gives for free: automatic `trace`/`video` config, parallel workers, and the HTML reporter used in [playwright.config.ts](../playwright.config.ts). Cucumber has its own equivalents (`--format html:cucumber-report.html`, `this.attach()` for embedding failure screenshots), but they're separate configuration to maintain, not shared with the rest of the suite. That's the real cost of running two test runners side by side in one repo — worth it here because the goal is learning Cucumber specifically, but worth flagging as a maintenance point for a real project.
