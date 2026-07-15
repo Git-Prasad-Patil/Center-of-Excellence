@@ -10,3 +10,4 @@ html-report/
 screenshots/
 test-results/.last-run.json
 cucumber-report.html
+.claude/
