@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../utils/fixtures";
 
-test("Autowaiting and force timeout", async ({ page }) => {
+test("Autowaiting and force timeout", async ({ page, homePage }) => {
   // Autowaiting is a feature in Playwright that automatically performs actionability checks before performing actions on elements.
   // This means that Playwright will wait for elements to be in a state where they can be interacted with (e.g., visible, enabled)
   // before attempting to perform actions on them.
@@ -19,7 +19,10 @@ test("Autowaiting and force timeout", async ({ page }) => {
 
   // timeout can be overridden for specific steps if needed, for example:
 
-  await page.goto("https://demowebshop.tricentis.com/");
+  // Navigation happens inside the `homePage` fixture (utils/fixtures.ts),
+  // which constructs HomePage and calls homePage.goto() before handing the
+  // page object to the test — so by the time this test body runs, `page` is
+  // already on the homepage.
 
   await expect(page).toHaveURL("https://demowebshop.tricentis.com/", {
     timeout: 3000,
@@ -35,5 +38,12 @@ test("Autowaiting and force timeout", async ({ page }) => {
   // regardless of its state (e.g., even if it's not visible or enabled).
   // This can be useful in certain scenarios where you want to interact with an element that may not meet the usual criteria for being actionable,
   // such as when testing edge cases or when dealing with elements that are intentionally hidden or disabled.
-  await page.locator("a:has-text('Register')").click({ force: true }); // This will click on the "Register" link even if it is not visible or enabled
+  // Design decision: the click still routes through HeaderNavComponent
+  // (no raw locator in the test), but `force: true` is passed in explicitly
+  // at the call site rather than hard-coded inside clickRegister(). Baking
+  // `force: true` permanently into the component would hide the exact thing
+  // this test demonstrates (bypassing actionability checks); keeping it as
+  // an explicit, visible option here preserves the lesson while still
+  // encapsulating the locator itself inside the component.
+  await homePage.headerNav.clickRegister({ force: true });
 });
