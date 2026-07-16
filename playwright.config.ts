@@ -6,11 +6,11 @@ export default defineConfig({
   expect: {
     timeout: 5000,
   },
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [["html", { open: "always", outputFolder: "html-report" }]],
+  reporter: process.env.CI ? 'blob' : [["html", { open: "always", outputFolder: "html-report" }]],
   use: {
     actionTimeout: 0,
     // baseURL: 'https://playwright.dev',
