@@ -1,7 +1,13 @@
-import { test } from "@playwright/test";
+import { test } from "../utils/fixtures";
 
-test("Screenshot", async ({ page }) => {
-  await page.goto("https://demowebshop.tricentis.com/");
+test("Screenshot", async ({ page, homePage }) => {
+  // Navigation happens inside the `homePage` fixture (utils/fixtures.ts)
+  // before this test body runs. Screenshotting itself isn't really a POM
+  // concern (per the DayNine notes), so the capture calls below stay close
+  // to their original form — `homePage` is only used here to confirm we're
+  // on the expected page before capturing it.
+  const welcomeText = await homePage.getWelcomeText();
+  console.log(`Screenshotting homepage (welcome banner: "${welcomeText}")`);
   // Date.now() returns the number of milliseconds elapsed since January 1, 1970, 00:00:00 UTC.
   // This is commonly used to generate unique timestamps for filenames or other purposes where a unique identifier is needed based on the current time.
   const timestamp = Date.now();

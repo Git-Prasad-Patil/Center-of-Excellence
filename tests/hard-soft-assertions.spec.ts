@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../utils/fixtures";
 
 // eslint-disable-next-line no-empty-pattern
 test("Hard Assertions - example", async ({}) => {
@@ -9,10 +9,14 @@ test("Hard Assertions - example", async ({}) => {
   expect(value).toBe(5);
 });
 
-test("Soft Assertions - example", async ({ page }) => {
+test("Soft Assertions - example", async ({ homePage }) => {
   // Soft Assertion: use `expect.soft` to allow the test to continue after failures.
-  await page.goto("https://demowebshop.tricentis.com/");
-  const title = await page.title();
+  // Navigation and title-reading are routed through the `homePage` fixture/
+  // page object; the assertion values themselves are left exactly as-is —
+  // this test is intentionally designed to still fail two of its three
+  // assertions, demonstrating soft-assertion behavior, and that outcome
+  // must not change.
+  const title = await homePage.getTitle();
   expect.soft(title).toBe("Demo Web Shop"); // likely passes
   expect.soft(title).toBe("Incorrect Title"); // will fail but test continues
   expect.soft(title).toBe("Prasad Patil");
