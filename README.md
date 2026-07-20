@@ -3,15 +3,17 @@
 A TypeScript-based collection of testing best-practices, exercises and sample automation using Playwright and Cucumber BDD. Intended as training material and working examples for QA engineers and developers.
 
 ## What you'll find here
-- DayOne ... DayEight — Markdown lessons and exercises covering clean code, TDD, error handling, test resilience, and more.
+- DayOne ... DayTen — Markdown lessons and exercises covering clean code, TDD, error handling, test resilience, BDD, AI-assisted testing, CI/CD, POM architecture, and mutation testing.
 - Playwright Test examples (tests/ + playwright.config.ts)
 - Cucumber BDD features (features/) with TypeScript step definitions
+- Vitest unit tests (unit/) for framework/utility logic, with Stryker mutation testing (stryker.conf.json)
 - Utility helpers in utils/
 
 ## Stack
 - Node.js + TypeScript
 - Playwright Test (@playwright/test)
 - Cucumber.js (@cucumber/cucumber) for BDD
+- Vitest for unit tests, Stryker Mutator for mutation testing
 - ts-node for running TypeScript step-definitions
 - winston for logging examples
 
@@ -51,10 +53,22 @@ A TypeScript-based collection of testing best-practices, exercises and sample au
    npm run lint
    ```
 
+7. Run unit tests (Vitest)
+   ```bash
+   npm run test:unit
+   ```
+
+8. Run mutation testing (Stryker)
+   ```bash
+   npm run test:mutation
+   ```
+   Scoped to `features/support/money.ts` and `utils/test-data-factory.ts`; report written to `reports/mutation/mutation.html`.
+
 ## Project layout
 - features/ — Gherkin `.feature` files and TypeScript step-definitions/support
 - tests/ — Playwright Test files and fixtures
-- DayOne..DayEight/ — training notes and exercises (Markdown)
+- unit/ — Vitest unit tests for pure framework/utility logic
+- DayOne..DayTen/ — training notes and exercises (Markdown)
 - utils/ — helper utilities and shared code
 - playwright.config.ts — Playwright test configuration
 - cucumber.js — Cucumber configuration for feature discovery and formatters

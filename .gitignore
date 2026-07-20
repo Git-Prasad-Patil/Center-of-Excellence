@@ -8,6 +8,8 @@ playwright-report/
 test-results/
 html-report/
 screenshots/
+reports/
+.stryker-tmp/
 test-results/.last-run.json
 cucumber-report.html
 .claude/
